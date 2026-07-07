@@ -1,0 +1,255 @@
+---
+title: "Medical Student Mental Health Dashboard"
+subtitle: "Project Report"
+author: "Selma Othmani"
+date: "April 2026"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: false
+    theme: united
+    highlight: tango
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+> **Note**
+>
+> This project was originally developed in **French** as part of a university assignment at the **Université de Montréal**.
+>
+> To make the project accessible to a broader audience and suitable for an international portfolio, the documentation has been translated and adapted into **English**. The dashboard interface remains in French, while its functionality and analytical approach are fully described in this report.
+
+---
+
+# 1. Project Background
+
+*This project was developed as part of a university assignment based on a fictional professional scenario.*
+
+In this scenario, a research team in medical education seeks to better understand the relationships between mental health, empathy, burnout, and lifestyle factors among medical students. Although the researchers have access to a comprehensive survey dataset, extracting meaningful insights from numerous demographic, lifestyle, and psychometric variables remains challenging using traditional tables and descriptive statistics alone.
+
+To address this need, an interactive dashboard was developed using **R Shiny** to support exploratory data analysis through dynamic visualizations and descriptive statistics. The application enables users to compare student profiles, explore relationships between mental health indicators and explanatory variables, and identify patterns that may support future research.
+
+Rather than serving as a predictive model, the dashboard was designed as a decision-support and data exploration tool. It illustrates a complete data analysis workflow, from data preparation and transformation to interactive visualization and the communication of insights for both technical and non-technical users.
+
+# 2. Dataset Overview
+
+The dataset used in this project originates from the study *The Relationship Between Medical Students' Empathy, Mental Health, and Burnout: A Cross-Sectional Study* published in *Medical Teacher* (Carrard et al., 2022).
+
+The original dataset contains **886 survey responses** from medical students, with each record representing a single participant. It includes **20 variables** covering demographic characteristics, lifestyle factors, perceived social support, and validated psychometric measures related to mental health, burnout, and empathy.
+
+During the preprocessing stage, a small number of observations belonging to a sparsely represented category were removed to improve the clarity of categorical visualizations without materially affecting the overall descriptive analyses.
+
+The diversity of variables makes this dataset well suited for **Exploratory Data Analysis (EDA)**, enabling users to investigate potential relationships between demographic characteristics, lifestyle factors, and mental health outcomes through interactive visualizations.
+
+The variables can be organized into three main categories according to their role in the analyses.
+
+```{r variable-categories, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+library(tibble)
+
+variable_categories <- tribble(
+  ~Category, ~Variables,
+  "Demographic Characteristics",
+  "Participant ID, Age, Sex, Native Language, Year of Study",
+
+  "Lifestyle and Personal Context",
+  "Weekly Study Hours, Employment Status, Relationship Status, Perceived Social Support, Self-rated Health, Psychological Consultation (Past 12 Months)",
+
+  "Psychometric Measures",
+  "Cognitive Empathy, Affective Empathy, Empathy, Emotional Recognition Score, Depression, Anxiety, Emotional Exhaustion, Cynicism, Academic Efficacy"
+)
+
+variable_categories %>%
+  kable(
+    col.names = c("Category", "Variables"),
+    align = c("l", "l"),
+    booktabs = TRUE
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, color = "white", background = "#2C3E50") %>%
+  column_spec(1, bold = TRUE, width = "3cm") %>%
+  column_spec(2, width = "11cm")
+```
+# 3. Psychometric Measures
+
+The dashboard focuses on validated psychometric instruments commonly used to assess **mental health**, **burnout**, and **empathy** among medical students. These standardized instruments provide quantitative measures that facilitate comparisons across participants and support exploratory data analysis.
+
+The primary psychometric measures included in this dashboard were selected based on their relevance to student well-being and their widespread use in the scientific literature.
+
+```{r psychometric-table, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+library(tibble)
+
+psychometric_table <- tribble(
+  ~Variable, ~Instrument, ~`What it Measures`, ~`Score Range`,
+  "Depression", "CES-D", "Frequency of depressive symptoms", "0–60",
+  "Anxiety", "STAI", "Trait anxiety", "20–80",
+  "Emotional Exhaustion", "MBI-EE", "Emotional fatigue associated with burnout", "0–54",
+  "Cynicism", "MBI-CY", "Psychological detachment toward academic activities", "0–30",
+  "Empathy", "JSPE", "Empathy in medical practice", "20–140",
+  "Academic Efficacy", "MBI-EA", "Perceived academic competence", "6–36"
+)
+
+psychometric_table %>%
+  kable(
+    align = c("l", "c", "l", "c"),
+    booktabs = TRUE
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, color = "white", background = "#2C3E50")
+```
+
+These instruments have been extensively validated and are widely used in research on **medical education**, **mental health**, and **burnout**. Their inclusion provides a robust framework for exploring relationships between psychological well-being, lifestyle factors, and demographic characteristics.
+
+Although clinical interpretation thresholds exist for several of these instruments, this dashboard is intended exclusively for **descriptive and exploratory analysis**. The visualizations are designed to explore score distributions and relationships between variables rather than to support clinical diagnosis or participant classification.
+
+# 4. Data Preparation
+
+Before developing the dashboard, the dataset underwent several preprocessing steps to improve data quality, ensure consistency, and optimize the interactive analyses.
+
+### Variable Renaming
+
+Technical variable names were replaced with descriptive Frensh labels to improve readability and facilitate interpretation throughout the dashboard. For example, variables such as `stai_t` and `stud_h` were renamed to more intuitive names (`anxiete` and `heure_etude`).
+
+### Feature Selection
+
+Only the variables relevant to the project's objectives were retained. The final dataset includes only measures required for the analyses.
+
+### Data Type Transformation
+
+Variables were converted to appropriate data types to support statistical analyses and interactive visualizations. Categorical variables (e.g., sex, relationship status, and employment status) were encoded as factors with meaningful labels, while quantitative variables were stored as numeric values.
+
+### Data Cleaning
+
+The original dataset contained **886 observations**. During preprocessing, a small number of observations belonging to a sparsely represented category were removed to improve the readability of categorical visualizations without materially affecting the descriptive analyses.
+
+# 5. Variables Used
+
+The final dataset includes the variables required to explore the relationships between demographic characteristics, lifestyle factors, and mental health indicators. The table below summarizes the variables retained for the analyses.
+
+```{r variables-used, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+library(tibble)
+
+variables_used <- tribble(
+  ~Variable, ~Description, ~`Data Type`,
+  "Age", "Participant's age", "Numeric",
+  "Sex", "Participant's sex", "Categorical",
+  "Year of Study", "Academic year", "Numeric",
+  "Relationship Status", "Relationship status", "Categorical",
+  "Employment Status", "Employment status", "Categorical",
+  "Weekly Study Hours", "Average study hours per week", "Numeric",
+  "Perceived Social Support", "Self-reported social support score", "Numeric",
+  "Empathy", "JSPE score", "Numeric",
+  "Depression", "CES-D score", "Numeric",
+  "Anxiety", "STAI score", "Numeric",
+  "Emotional Exhaustion", "MBI-EE score", "Numeric",
+  "Cynicism", "MBI-CY score", "Numeric",
+  "Academic Efficacy", "MBI-EA score", "Numeric"
+)
+
+variables_used %>%
+  kable(
+    caption = "Variables retained for the dashboard analyses.",
+    booktabs = TRUE,
+    align = c("l", "l", "c")
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, color = "white", background = "#2C3E50")
+```
+
+Only the variables relevant to the dashboard objectives were retained after preprocessing. Additional variables available in the original dataset were intentionally excluded to keep the analyses focused.
+Overall, these preprocessing steps produced a clean, consistent, and analysis-ready dataset suitable for exploratory data analysis and interactive visualization.
+
+# 6. Dashboard Design and Analytical Approach
+
+The dashboard was designed to guide users through a progressive **Exploratory Data Analysis (EDA)** workflow, moving from a high-level overview of the dataset to more detailed investigations of relationships between variables.
+
+Its structure is organized into six complementary sections, each supporting a specific stage of the analytical process.
+
+```{r dashboard-sections, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+library(tibble)
+
+dashboard_sections <- tribble(
+  ~Section, ~Purpose,
+  "Overview (Vue Générale)",
+  "Summarizes the dataset through key descriptive statistics and global indicators.",
+
+  "Data Table (Tableau)",
+  "Provides an interactive table with filtering and search capabilities for customized data exploration.",
+
+  "Profiles (Profils)",
+  "Presents univariate analyses describing the distribution of demographic and lifestyle variables.",
+
+  "Relationships (Relations)",
+  "Explores associations between psychometric scores and explanatory variables using comparative visualizations.",
+
+  "Trends (Tendances)",
+  "Investigates relationships between continuous variables using scatter plots and simple linear regression.",
+
+  "Help (Aide)",
+  "Provides user guidance, interpretation of psychometric measures, and links to scientific references."
+)
+
+dashboard_sections %>%
+  kable(
+    booktabs = TRUE,
+    align = c("l", "l")
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, color = "white", background = "#2C3E50")
+```
+
+Overall, the dashboard follows the principles of **Exploratory Data Analysis (EDA)** by progressively guiding users from descriptive summaries to multivariable exploration through interactive visualizations. Rather than providing predictive models, the application is designed to facilitate data interpretation, identify potential relationships, and support evidence-informed discussions.
+
+# 7. Key Skills Demonstrated
+
+This project demonstrates practical competencies in **health data analytics**, including:
+
+- Data preparation and preprocessing
+- Exploratory Data Analysis (EDA)
+- Interactive dashboard development with **R Shiny**
+- Data visualization and communication
+- Descriptive statistics and simple linear regression
+
+Overall, this project illustrates the ability to transform raw health data into an interactive dashboard that supports data exploration and evidence-informed interpretation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

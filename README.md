@@ -1,7 +1,7 @@
 # Medical Student Mental Health Dashboard
 
 **Project Report:**  
-https://othmenisalma-cell.github.io/Medical-Student-Mental-Health-Dashboard/Report.html
+https://salma-othmani.github.io/Medical-Student-Mental-Health-Dashboard/Report.html
 
 An interactive dashboard built with **R Shiny** to explore mental health indicators among medical students through descriptive statistics and interactive visualizations.
 The dashboard transforms a public health dataset into an intuitive application that facilitates data exploration and supports the interpretation of psychological indicators.

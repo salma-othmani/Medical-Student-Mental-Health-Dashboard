@@ -1,0 +1,13 @@
+name: Medical-Student-Mental-Health-Dashboard
+title: Medical-Student-Mental-Health-Dashboard
+username: salma-othmani
+account: salma-othmani
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 17594169
+bundleId: 12240170
+url: https://salma-othmani.shinyapps.io/Medical-Student-Mental-Health-Dashboard/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|Codebook.csv|README.html|README.md|Report.html|Report.Rmd|screenshots

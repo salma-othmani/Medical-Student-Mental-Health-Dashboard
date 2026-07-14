@@ -8,7 +8,7 @@ library(DT)
 library(plotly)
 library(shinythemes)
 
-
+source("pretraitement.R")
 
 function(input, output, session) {
   

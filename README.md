@@ -1,5 +1,8 @@
 # Medical Student Mental Health Dashboard
 
+**Live Application: **  
+https://salma-othmani.shinyapps.io/Medical-Student-Mental-Health-Dashboard/
+
 **Project Report:**  
 https://salma-othmani.github.io/Medical-Student-Mental-Health-Dashboard/Report.html
 
